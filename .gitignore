@@ -110,6 +110,7 @@ ENV/
 env.bak/
 venv.bak/
 reports/
+data/
 
 # Spyder project settings
 .spyderproject
