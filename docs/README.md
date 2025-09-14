@@ -1,0 +1,256 @@
+# Herramienta para la detección rápida de neumonía
+
+Clasificación de radiografías de tórax (DICOM/JPG/PNG) en tres categorías mediante Deep Learning:
+
+1) **Neumonía bacteriana**  
+2) **Neumonía viral**  
+3) **Sin neumonía**
+
+El sistema genera explicaciones con **Grad-CAM**, superponiendo un mapa de calor sobre la imagen para resaltar las regiones más relevantes.
+
+---
+
+## 🚦 Estado del proyecto
+
+- **Python recomendado:** **3.11.4** (probado con TensorFlow 2.18 + Keras 3.8)  
+- **Sistema:** Windows / Linux / macOS (para GUI en contenedor no aplica)  
+- **Modelo por defecto:** `models/conv_MLP_84.h5`
+
+> Si usas otra versión de Python, asegúrate de que sea compatible con tu versión de TensorFlow.
+
+---
+
+## 🖼️ Vistas & ejemplos
+
+- **GUI (Tkinter)**  
+  `docs/img/ui_tk.png`
+
+- **Grad-CAM (CLI/Smoke)**  
+  `docs/img/gradcam_example.png`
+
+
+---
+
+## ✨ Características
+
+- Lectura de **DICOM/JPG/PNG** → normalización a **RGB**.
+- Preprocesamiento: **grises**, **resize 512×512**, **CLAHE**, **[0,1]**, tensor **(1,H,W,1)**.
+- Inferencia con modelo Keras/TensorFlow (.h5).
+- **Grad-CAM** (overlay RGB) explicable.
+- **CLI** y **GUI** (Tkinter).
+- Reportes nombrados con **cédula + timestamp**.
+- Suite de pruebas con **pytest**.
+
+---
+
+## 📦 Instalación
+
+### Opción A — venv + pip (recomendada)
+
+#### PowerShell (Windows)
+```powershell
+python -m venv .venv
+.venv\Scripts\Activate.ps1
+
+pip install -r requirements.txt
+```
+
+#### Bash (Linux/macOS)
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+
+pip install -r requirements.txt
+```
+
+> Tip: para reducir mensajes de TensorFlow en PowerShell:  
+> `$env:TF_CPP_MIN_LOG_LEVEL="2"`
+
+### Opción B — Conda (opcional)
+```bash
+conda create -n tf python=3.10 -y
+conda activate tf
+pip install -r requirements.txt
+```
+
+---
+
+## 🚀 Uso rápido
+
+### 1) Smoke test (validación mínima end-to-end)
+```powershell
+python -m scripts.smoke
+```
+- Imprime *label* + probabilidad.
+- Guarda: `reports/figures/<CEDULA>_heatmap_YYYYMMDD-HHMMSS.png` + `.txt`  
+  (La cédula se define en `scripts/smoke.py`).
+
+### 2) CLI (pipeline completo)
+```powershell
+python -m src.visualizations.integrator `
+  --input "data/raw/DICOM/normal (2).dcm" `
+  --model "models/conv_MLP_84.h5" `
+  --last-conv "conv10_thisone" `
+  --patient-id "123456789" `
+  --outdir "reports/figures"
+```
+
+### 3) GUI (Tkinter)
+```powershell
+python -m src.visualizations.ui_tk
+```
+Flujo en interfaz:
+- Ingrese **cédula**.
+- **Cargar Imagen** → seleccione DICOM/JPG/PNG.
+- **Predecir** → muestra clase, prob y Grad-CAM.
+- **Guardar** → `reports/gui/historial.csv`.
+- **PDF** → `reports/gui/Reporte_<CEDULA>_<YYYYMMDD-HHMMSS>.pdf` (+ .jpg).
+
+> Para exportar PDF: `pip install tkcap img2pdf`.
+
+---
+
+## 🐳 Docker (solo CLI dentro de contenedor)
+
+> **Nota:** GUI Tkinter no está soportada dentro del contenedor (no hay servidor gráfico). Usa Docker solo para la **CLI**.
+
+### Dockerfile (ejemplo mínimo)
+```dockerfile
+FROM python:3.10-slim
+
+WORKDIR /app
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY . .
+
+# Ejemplo de entrada por defecto
+CMD ["python", "-m", "src.visualizations.integrator",      "--input", "data/raw/DICOM/normal (2).dcm",      "--model", "models/conv_MLP_84.h5",      "--last-conv", "conv10_thisone",      "--outdir", "reports/figures"]
+```
+
+### Build
+```bash
+docker build -t neumonia:latest .
+```
+
+### Run (montando datos, modelos y reports)
+```bash
+# PowerShell (Windows)
+docker run --rm -it ^
+  -v "%cd%/data:/app/data" ^
+  -v "%cd%/models:/app/models" ^
+  -v "%cd%/reports:/app/reports" ^
+  neumonia:latest ^
+  python -m src.visualizations.integrator ^
+    --input "data/raw/DICOM/normal (2).dcm" ^
+    --model "models/conv_MLP_84.h5" ^
+    --last-conv "conv10_thisone" ^
+    --patient-id "123456789" ^
+    --outdir "reports/figures"
+```
+
+```bash
+# Bash (Linux/macOS)
+docker run --rm -it   -v "$(pwd)/data:/app/data"   -v "$(pwd)/models:/app/models"   -v "$(pwd)/reports:/app/reports"   neumonia:latest   python -m src.visualizations.integrator     --input "data/raw/DICOM/normal (2).dcm"     --model "models/conv_MLP_84.h5"     --last-conv "conv10_thisone"     --patient-id "123456789"     --outdir "reports/figures"
+```
+
+---
+
+## 🗂️ Estructura del proyecto
+
+```
+.
+├── data/
+│   └── raw/...
+├── models/
+│   └── conv_MLP_84.h5
+├── reports/
+│   ├── figures/      # salidas CLI/smoke
+│   └── gui/          # PDFs/JPGs de la GUI + CSV
+├── scripts/
+│   └── smoke.py
+├── src/
+│   ├── data/
+│   │   ├── read_img.py
+│   │   └── preprocess_img.py
+│   ├── models/
+│   │   ├── load_model.py
+│   │   └── grad_cam.py
+│   └── visualizations/
+│       ├── integrator.py
+│       └── ui_tk.py
+├── tests/
+│   └── test_*.py
+├── docs/
+│   └── img/          # imágenes para el README
+├── requirements.txt
+└── README.md
+```
+
+---
+
+## 🧪 Pruebas
+
+Ejecutar toda la suite:
+```bash
+pytest -q
+```
+
+Comandos útiles:
+```bash
+pytest -vv              # detallado
+pytest -k preprocess    # por patrón
+pytest --last-failed    # solo fallos previos
+pytest --durations=5    # tests más lentos
+```
+
+---
+
+## 🔧 Troubleshooting
+
+- **PowerShell: “la ejecución de scripts está deshabilitada”**  
+  Abre PowerShell **como admin** y ejecuta:
+  ```powershell
+  Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+  ```
+
+
+- **DICOM comprimidos no abren**  
+  Asegúrate de tener: `pylibjpeg`, `pylibjpeg-libjpeg`, `pylibjpeg-openjpeg`.
+
+---
+
+## 🧠 Detalles técnicos (resumen)
+
+- **Preprocesamiento:** gris → 512×512 → CLAHE → [0,1] → (1,512,512,1).
+- **Modelo:** Keras/TensorFlow (`.h5`)  
+  Última capa conv por defecto: `conv10_thisone` (configurable con `--last-conv`).
+- **Grad-CAM:** Gradientes dirigidos a la clase para ponderar activaciones de la última capa conv y superponer en RGB.
+
+---
+
+## 📜 Licencia (sugerida)
+
+Se distribuye con licencia **MIT**.
+```
+MIT License
+
+Copyright (c) 2025 ...
+```
+Texto completo: https://opensource.org/license/mit/
+
+---
+
+## 👩🏽‍💻 Créditos
+
+Proyecto original:
+- **Isabella Torres Revelo** — https://github.com/isa-tr
+- **Nicolás Díaz Salazar** — https://github.com/nicolasdiazsalazar
+
+Proyecto adaptado y modificado:
+- **Joan Andres Velasquez** — https://github.com/JoanV83
+- **Edwin Vicente Zapata** — https://github.com/edwinviz
+- **Miguel Saavedra** — https://github.com/mash4403
+- **Andres Velasco** — https://github.com/Andres-Velasco07
+
+

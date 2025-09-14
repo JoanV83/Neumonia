@@ -1,0 +1,1 @@
+clase=normal, probabilidad=0.9989
