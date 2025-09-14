@@ -131,3 +131,6 @@ dmypy.json
 models/*.h5
 conv_MLP84.h5
 WilhemNet86.h5
+
+# modelos grandes
+*.h5
