@@ -16,7 +16,7 @@ El sistema genera explicaciones con **Grad-CAM**, superponiendo un mapa de calor
 - **Sistema:** Windows / Linux / macOS (para GUI en contenedor no aplica)  
 - **Modelo por defecto:** `models/conv_MLP_84.h5`
 
-> Si usas otra versión de Python, asegúrate de que sea compatible con tu versión de TensorFlow.
+
 
 ---
 
@@ -63,8 +63,6 @@ source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
-> Tip: para reducir mensajes de TensorFlow en PowerShell:  
-> `$env:TF_CPP_MIN_LOG_LEVEL="2"`
 
 ### Opción B — Conda (opcional)
 ```bash
@@ -106,15 +104,14 @@ Flujo en interfaz:
 - **Guardar** → `reports/gui/historial.csv`.
 - **PDF** → `reports/gui/Reporte_<CEDULA>_<YYYYMMDD-HHMMSS>.pdf` (+ .jpg).
 
-> Para exportar PDF: `pip install tkcap img2pdf`.
 
 ---
 
-## 🐳 Docker (solo CLI dentro de contenedor)
+## 🐳 Docker
 
-> **Nota:** GUI Tkinter no está soportada dentro del contenedor (no hay servidor gráfico). Usa Docker solo para la **CLI**.
 
-### Dockerfile (ejemplo mínimo)
+
+### Dockerfile 
 ```dockerfile
 FROM python:3.10-slim
 
@@ -165,8 +162,8 @@ docker run --rm -it   -v "$(pwd)/data:/app/data"   -v "$(pwd)/models:/app/models
 ├── models/
 │   └── conv_MLP_84.h5
 ├── reports/
-│   ├── figures/      # salidas CLI/smoke
-│   └── gui/          # PDFs/JPGs de la GUI + CSV
+│   ├── figures/      
+│   └── gui/          
 ├── scripts/
 │   └── smoke.py
 ├── src/
@@ -182,9 +179,12 @@ docker run --rm -it   -v "$(pwd)/data:/app/data"   -v "$(pwd)/models:/app/models
 ├── tests/
 │   └── test_*.py
 ├── docs/
-│   └── img/          # imágenes para el README
+│   └── img/ 
+|   └── README.md   
 ├── requirements.txt
-└── README.md
+├── gitignore
+├── LICENCE.txt
+└── Dockerfile
 ```
 
 ---
@@ -220,7 +220,7 @@ pytest --durations=5    # tests más lentos
 
 ---
 
-## 🧠 Detalles técnicos (resumen)
+## 🧠 Detalles técnicos 
 
 - **Preprocesamiento:** gris → 512×512 → CLAHE → [0,1] → (1,512,512,1).
 - **Modelo:** Keras/TensorFlow (`.h5`)  
@@ -229,7 +229,7 @@ pytest --durations=5    # tests más lentos
 
 ---
 
-## 📜 Licencia (sugerida)
+## 📜 Licencia
 
 Se distribuye con licencia **MIT**.
 ```
