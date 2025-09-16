@@ -1,8 +1,8 @@
-# 🐳 Guía de Uso con Docker
+# Guía de Uso con Docker
 
 Esta guía te ayudará a usar el detector de neumonía con Docker de manera local.
 
-## 🚀 Inicio Rápido
+##  Inicio Rápido
 
 ### 1. Construir la imagen Docker
 
@@ -36,7 +36,7 @@ docker run --rm \
   --patient-id "123456789"
 ```
 
-## 📁 Estructura de Directorios
+##  Estructura de Directorios
 
 La imagen Docker espera esta estructura de directorios:
 
@@ -50,7 +50,7 @@ tu-proyecto/
     └── figures/
 ```
 
-## 🛠️ Comandos Útiles
+##  Comandos Útiles
 
 ### Verificar la imagen
 ```bash
@@ -136,7 +136,7 @@ docker run -it --rm neumonia-detector:latest /bin/bash
 docker run --rm neumonia-detector:latest --input data/test.dcm --model models/conv_MLP_84.h5
 ```
 
-## 📊 Ejemplo Completo
+##  Ejemplo Completo
 
 Suponiendo que tienes:
 - `models/conv_MLP_84.h5` (tu modelo entrenado)
@@ -173,7 +173,7 @@ for imagen in data/pacientes/*.dcm; do
 done
 ```
 
-## 📈 Monitoreo y Logs
+##  Monitoreo y Logs
 
 ```bash
 # Ver recursos utilizados
@@ -186,7 +186,7 @@ docker logs -f <container_id>
 docker logs neumonia-detector > detector.log 2>&1
 ```
 
-## 🔐 Consideraciones de Seguridad
+##  Consideraciones de Seguridad
 
 - Los modelos `.h5` contienen información sensible
 - Usa volúmenes con permisos restringidos
