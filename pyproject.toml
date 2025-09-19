@@ -1,0 +1,46 @@
+[project]
+name = "neumonia-detector"
+version = "1.0.0"
+description = "Detector de neumonía con ML usando Grad-CAM"
+requires-python = ">=3.10"
+dependencies = [
+    # Core ML/TF stack
+    "tensorflow==2.18.0",
+    "keras==3.8.0", 
+    "numpy==2.0.2",
+    "h5py==3.12.1",
+    "protobuf==5.29.3",
+    "flatbuffers==25.1.24",
+    "absl-py==2.1.0",
+    
+    # IO / imágenes / dicom
+    "opencv-python==4.11.0.86",
+    "pillow==11.1.0",
+    "pydicom==3.0.1",
+    
+    # Plugins para DICOM comprimido
+    "pylibjpeg==2.0.1",
+    "pylibjpeg-libjpeg==2.3.0",
+    "pylibjpeg-openjpeg==2.4.0",
+    
+    # Utilidades
+    "pandas==2.2.3",
+    "matplotlib==3.10.0",
+    "requests==2.32.3",
+    
+    # GUI Tk / exportación PDF
+    "tkcap==0.0.4",
+    "img2pdf==0.5.1",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest==8.3.3",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.uv]
+# Configuración específica de UV si necesitas

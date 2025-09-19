@@ -1,0 +1,12 @@
+services:
+  neumonia:
+    image: neumonia-detector:latest
+    container_name: neumonia-local
+    volumes:
+      - ./models:/app/models
+      - ./data:/app/data  
+      - ./reports:/app/reports
+    environment:
+      - PYTHONPATH=/app
+      - TF_CPP_MIN_LOG_LEVEL=2
+    command: --help

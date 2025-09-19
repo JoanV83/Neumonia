@@ -1,0 +1,63 @@
+# Git y control de versiones
+.git
+.gitignore
+README.md
+*.md
+
+# Python cache y temporales
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+.coverage
+
+# Entornos virtuales (no van en Docker)
+.venv/
+venv/
+env/
+ENV/
+
+# IDEs y editores
+.vscode/
+.idea/
+*.swp
+.spyderproject
+.spyproject
+
+# Archivos del SO
+.DS_Store
+Thumbs.db
+
+# Logs y reportes temporales (se generan en runtime)
+*.log
+reports/
+
+# Docker files (no copiarse a sí mismo)
+Dockerfile*
+docker-compose*
+.dockerignore
+
+# Scripts de automatización (no van dentro)
+build.sh
+dev.sh
+run.sh
+
+# Archivos de desarrollo
+tests/
+test_*
+*_test.py
+
+# Modelos grandes (van por volumen)
+*.h5
+models/
+WilhemNet86.h5
+conv_MLP84.h5
+
+# Datos de ejemplo (van por volumen)  
+data/
+*.dcm
+*.dicom
+
+# Documentación
+docs/
+examples/
