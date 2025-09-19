@@ -113,42 +113,69 @@ Flujo en interfaz:
 
 ### Dockerfile 
 ```dockerfile
-FROM python:3.10-slim
+# Imagen base ligera para CPU
+FROM python:3.11-slim
 
+# Configurar entorno
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1
+
+# Instalar dependencias del sistema necesarias para OpenCV-headless y TensorFlow
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+        libglib2.0-0 \
+        libgomp1 && \
+    rm -rf /var/lib/apt/lists/*
+
+# Establecer directorio de trabajo
 WORKDIR /app
+
+# Copiar requirements.txt y instalar dependencias Python
 COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir -r requirements.txt
 
-COPY . .
+# Copiar código fuente completo
+COPY src/ ./src/
+COPY scripts/ ./scripts/
 
-# Ejemplo de entrada por defecto
-CMD ["python", "-m", "src.visualizations.integrator",      "--input", "data/raw/DICOM/normal (2).dcm",      "--model", "models/conv_MLP_84.h5",      "--last-conv", "conv10_thisone",      "--outdir", "reports/figures"]
+# Crear directorios para modelos, datos y reportes
+RUN mkdir -p models data reports
+
+# Configurar entrada usando el módulo correcto
+ENTRYPOINT ["python", "-m", "src.visualizations.integrator"]
+CMD ["--help"]
 ```
 
-### Build
 ```bash
-docker build -t neumonia:latest .
+docker build -t neumonia:cli .
 ```
 
-### Run (montando datos, modelos y reports)
-```bash
-# PowerShell (Windows)
-docker run --rm -it ^
-  -v "%cd%/data:/app/data" ^
-  -v "%cd%/models:/app/models" ^
-  -v "%cd%/reports:/app/reports" ^
-  neumonia:latest ^
-  python -m src.visualizations.integrator ^
-    --input "data/raw/DICOM/normal (2).dcm" ^
-    --model "models/conv_MLP_84.h5" ^
-    --last-conv "conv10_thisone" ^
-    --patient-id "123456789" ^
-    --outdir "reports/figures"
-```
 
 ```bash
 # Bash (Linux/macOS)
-docker run --rm -it   -v "$(pwd)/data:/app/data"   -v "$(pwd)/models:/app/models"   -v "$(pwd)/reports:/app/reports"   neumonia:latest   python -m src.visualizations.integrator     --input "data/raw/DICOM/normal (2).dcm"     --model "models/conv_MLP_84.h5"     --last-conv "conv10_thisone"     --patient-id "123456789"     --outdir "reports/figures"
+docker run --rm -it \
+  -v "$(pwd)/data:/app/data" \
+  -v "$(pwd)/models:/app/models" \
+  -v "$(pwd)/reports:/app/reports" \
+  neumonia:cli \
+  --input "data/raw/DICOM/normal (2).dcm" \
+  --model "models/conv_MLP_84.h5" \
+  --last-conv "conv10_thisone" \
+  --outdir "reports/figures"
+```
+
+```powershell
+# Powershell (Windows)
+docker run --rm -it `
+  -v "$PWD/data:/app/data" `
+  -v "$PWD/models:/app/models" `
+  -v "$PWD/reports:/app/reports" `
+  neumonia:cli `
+  --input "data/raw/DICOM/normal (2).dcm" `
+  --model "models/conv_MLP_84.h5" `
+  --last-conv "conv10_thisone" `
+  --outdir "reports/figures"
 ```
 
 ---
